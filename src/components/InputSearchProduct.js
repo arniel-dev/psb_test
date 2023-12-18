@@ -7,16 +7,15 @@ import OrderListTable from "./OrderListTable";
 
 function InputSearchProduct() {
   const [searchResult, setSearchResults] = React.useState([productData]);
-  const [rowsProduct, setRowsProduct] = React.useState();
+  const [rowProducts, setRowProducts] = React.useState([]);
   const [query, setQuery] = React.useState();
   const [qty, setQty] = React.useState();
-  const [isShow, setIsShow] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState(false);
 
   React.useEffect(() => {
-    const local = JSON.parse(localStorage.getItem("productList"));
-    console.log("local", local);
-    setRowsProduct(local);
-  }, [searchResult]);
+    const row = JSON.parse(localStorage.getItem("productList"));
+    setRowProducts(row);
+  }, [submitted]);
 
   const setSearchQuery = () => {
     setSearchResults(
@@ -33,25 +32,23 @@ function InputSearchProduct() {
   };
   const styleItem = {
     margin: "10px",
+    flexDirection: "row",
+    width: 500,
+    display: "flex",
   };
+  const labelStyle = { margin: "10px", width: "100%" };
 
   const addToCart = (e) => {
     e.preventDefault();
+    setSubmitted(true);
+    const local = JSON.parse(localStorage.getItem("productList"));
+    let toStore = [...local];
     const data = { ...searchResult[0], ...{ qty: qty } };
-    let toStore = [];
     toStore.push(data);
-    if (rowsProduct !== undefined) {
-      console.log(rowsProduct);
-      //   //   toStore.push(rowsProduct);
-      //   toStore.push(rowsProduct);
-      toStore.push(rowsProduct?.map((i) => i));
-    }
-    // ;
-    console.log(toStore);
     localStorage.setItem("productList", JSON.stringify(toStore));
+    setSubmitted(false);
   };
-  //   console.log(localStorage.getItem("productList"));
-  //
+
   return (
     <>
       <Box
@@ -71,33 +68,39 @@ function InputSearchProduct() {
       </Box>
       {searchResult.map((item, idx) => {
         return (
-          <div style={{ display: "flex" }} key={item.id + idx}>
+          <div
+            style={{ display: "flex", width: "100%", flexDirection: "column" }}
+            key={item.id + idx}
+          >
             <div style={styleItem}>
-              <Typography>Product ID</Typography>
+              <Typography style={labelStyle}>Product ID</Typography>
               <TextField
                 id="productID"
                 value={item.id}
                 label=""
                 variant="outlined"
+                sx={{ width: "200px" }}
               />
-              <Typography>Cost</Typography>
+              <Typography style={labelStyle}>Cost</Typography>
               <TextField
                 id="cost"
                 value={item?.price}
                 label=""
                 variant="outlined"
+                sx={{ width: "200px" }}
               />
             </div>
             <div style={styleItem}>
-              <Typography>Product name</Typography>
+              <Typography style={labelStyle}>Product name</Typography>
               <TextField
                 id="name"
                 value={item.name}
                 label=""
                 variant="outlined"
+                sx={{ width: "200px" }}
               />
-              <Typography>Qty</Typography>
-              <TextField onChange={handleQty} />
+              <Typography style={labelStyle}>Qty</Typography>
+              <TextField onChange={handleQty} sx={{ width: "200px" }} />
             </div>
           </div>
         );
@@ -105,7 +108,7 @@ function InputSearchProduct() {
       <Button onClick={addToCart} variant="contained">
         Add to cart
       </Button>
-      {/* {rowsProduct && <OrderListTable rows={rowsProduct} />} */}
+      {rowProducts && <OrderListTable rows={rowProducts} />}
     </>
   );
 }
